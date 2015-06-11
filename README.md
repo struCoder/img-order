@@ -18,7 +18,7 @@ brew install graphicsmagick
 
 #### Linux
 ```
-sud apt-get install graphicsmagick
+sudo apt-get install graphicsmagick
 ```
 
 #### Windows
@@ -85,7 +85,7 @@ app.use(imgOrder(config));
  when get localhost:3100/customizeImg/zz.png?imageView/0/h/500
  and so on...
 2. format
- localhost:3100/customizeImg/zz.png?format/jpg
+ localhost:3100/customizeImg/zz.png?/format/jpg
  ad so on...
 */
 ...
@@ -126,7 +126,7 @@ brew install graphicsmagick
 
 #### Linux
 ```
-sud apt-get install graphicsmagick
+sudo apt-get install graphicsmagick
 ```
 
 #### Windows
@@ -191,7 +191,7 @@ app.use(imgOrder(config));
  when get localhost:3100/customizeImg/zz.png?imageView/0/h/500
  and so on...
 2. 不同格式输出
- localhost:3100/customizeImg/zz.png?format/jpg
+ localhost:3100/customizeImg/zz.png?/format/jpg
  ad so on...
 */
 ```
