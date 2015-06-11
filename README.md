@@ -50,13 +50,14 @@ app.use(imgOrder(config));
 
 Interface specification
 -----------------------
-imageView/`mode`
-        /w/`Width`
-        /h/`Height`
-        /format/`Format`
+
+    imageView /<mode>
+        /w/<Width>
+        /h/<Height>
+        /format/<Format>
 
 
-| First Header  | Second Header |
+| mode  | Introduction |
 | ------------- | ------------- |
 | /0/w/`LongEdge`/h/`ShortEdge`  | Limit the long sides of the thumbnail for a maximum of `LongEdge`, short edge up to `ShortEdge`, carries on the geometric scaling, not cut. If only specify `w` parameters is limited long (short) and adaptive, specify only `h` parameter indicates limited short side (long edge adaptive).  |
 | /1/w/`Width`/h/`Height`  | Qualified thumbnail wide at least for ` Width `, high minimum of `Height`, carries on the geometric scaling, center cut. After turning the thumbnail usually happens to be  `Width` x ` Height ` size (one side when zooming by beyond rectangular box was cut off excess part). If you only specify w parameters or only specified h, on behalf of the limited to tetragonal figure is as broad as it is  |
@@ -66,6 +67,23 @@ imageView/`mode`
 | /5/w/`LongEdge`/h/`ShortEdge`  | Limit the long sides of the thumbnail for at least the `LongEdge`, short edge at least for `ShortEdge`, carries on the geometric scaling, center cut. If you only specify w parameters or only specified h, said long should be the same value in a short while.  |
 | /format/`Format`/`format`  | The output of the new format  |
 
+
+example
+---------
+```javascript
+...
+var imgOrder = require('img-order');
+var config = {
+  dest: 'C:/Users/david/Pictures/lovewallpaper/',
+  url: 'customizeImg',
+  tempImgDir: 'C:/Users/david/Pictures/temp'
+}
+app.use(imgOrder(config));
+
+// when get localhost:3100/customizeImg/zz.png?imageView/0/h/500
+// you will get what image you want
+...
+```
 
 
 Todo
@@ -149,6 +167,22 @@ imageView/`mode`
 | /5/w/`LongEdge`/h/`ShortEdge`  | 限定缩略图的长边最少为`LongEdge`，短边最少为`ShortEdge`，进行等比缩放，居中裁剪。如果只指定`w` 参数或只指定`h`. 参数，表示长边短边限定为同样的值  |
 | /format/`Format`/`format`  | 格式化输出图片  |
 
+示例
+---------
+```javascript
+...
+var imgOrder = require('img-order');
+var config = {
+  dest: 'C:/Users/david/Pictures/lovewallpaper/',
+  url: 'customizeImg',
+  tempImgDir: 'C:/Users/david/Pictures/temp'
+}
+app.use(imgOrder(config));
+...
+
+// 当你访问 localhost:3100/customizeImg/zz.png?imageView/0/h/500
+// 你会得到你想要的图片
+```
 
 需要完成的任务
 -------
