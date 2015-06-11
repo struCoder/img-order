@@ -194,3 +194,8 @@ app.use(imgOrder(config));
 - [ ]  水印
 - [ ]  EXIF(EXchangeable Image File Format)
 
+
+License
+-------
+MIT
+
