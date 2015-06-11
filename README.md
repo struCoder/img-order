@@ -65,7 +65,7 @@ Interface specification
 | /3/w/`Width`/h/`Height`  | Qualified thumbnail wide at least for `Width`, high minimum of `Height`, carries on the geometric scaling, not cut. If only specify w parameters or only specified h, on behalf of the width is limited to the same value  |
 | /4/w/`LongEdge`/h/`ShortEdge`  | CLimit the long sides of the thumbnail for at least the `LongEdge`, short edge at least for `ShortEdge`, carries on the geometric scaling, not cut. If you only specify w parameters or only specified h, said long should be the same value in a short while  |
 | /5/w/`LongEdge`/h/`ShortEdge`  | Limit the long sides of the thumbnail for at least the `LongEdge`, short edge at least for `ShortEdge`, carries on the geometric scaling, center cut. If you only specify w parameters or only specified h, said long should be the same value in a short while.  |
-| /format/`Format`/`format`  | The output of the new format  |
+| /format/`format`  | The output of the new format  |
 
 
 example
@@ -80,8 +80,14 @@ var config = {
 }
 app.use(imgOrder(config));
 
-// when get localhost:3100/customizeImg/zz.png?imageView/0/h/500
-// you will get what image you want
+/* 
+1.customize Image:
+ when get localhost:3100/customizeImg/zz.png?imageView/0/h/500
+ and so on...
+2. format
+ localhost:3100/customizeImg/zz.png?format/jpg
+ ad so on...
+*/
 ...
 ```
 
@@ -165,7 +171,7 @@ imageView/`mode`
 | /3/w/`Width`/h/`Height`  | 限定缩略图的宽最少为`Width`，高最少为`Height`，进行等比缩放，不裁剪。如果只指定`w` 参数或只指定`h`. 参数，代表长宽限定为同样的值  |
 | /4/w/`LongEdge`/h/`ShortEdge`  | 限定缩略图的长边最少为`LongEdge`，短边最少为`ShortEdge`，进行等比缩放，不裁剪。如果只指定`w` 参数或只指定 `h` 参数，表示长边短边限定为同样的值  |
 | /5/w/`LongEdge`/h/`ShortEdge`  | 限定缩略图的长边最少为`LongEdge`，短边最少为`ShortEdge`，进行等比缩放，居中裁剪。如果只指定`w` 参数或只指定`h`. 参数，表示长边短边限定为同样的值  |
-| /format/`Format`/`format`  | 格式化输出图片  |
+| /format/`Format`/  | 格式化输出图片  |
 
 示例
 ---------
@@ -180,8 +186,14 @@ var config = {
 app.use(imgOrder(config));
 ...
 
-// 当你访问 localhost:3100/customizeImg/zz.png?imageView/0/h/500
-// 你会得到你想要的图片
+/* 
+1.定制图片:
+ when get localhost:3100/customizeImg/zz.png?imageView/0/h/500
+ and so on...
+2. 不同格式输出
+ localhost:3100/customizeImg/zz.png?format/jpg
+ ad so on...
+*/
 ```
 
 需要完成的任务
