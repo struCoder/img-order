@@ -111,10 +111,11 @@ var customizeImg = function(options) {
 				} else if (w || h) {
 					var temp = w || h;
 					if (temp > originW || temp > originH) {
-						this.stream(function(err, stdout) {
+						return this.stream(function(err, stdout) {
 							pipeStream(stdout);
 						});
 					}
+					
 					h = h || (temp * originH / originW).toFixed(1);
 					w = w || (originW * temp / originH).toFixed(1);
 					this.resize(w, h)

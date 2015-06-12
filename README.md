@@ -82,7 +82,7 @@ app.use(imgOrder(config));
 
 /* 
 1.customize Image:
- when get localhost:3100/customizeImg/zz.png?imageView/0/h/500
+ localhost:3100/customizeImg/zz.png?imageView/0/h/500
  and so on...
 2. format
  localhost:3100/customizeImg/zz.png?/format/jpg
@@ -157,10 +157,11 @@ app.use(imgOrder(config));
 
 接口规范
 -----------------------
-imageView/`mode`
-        /w/`Width`
-        /h/`Height`
-        /format/`Format`
+
+    imageView /<mode>
+        /w/<Width>
+        /h/<Height>
+        /format/<Format>
 
 
 | 模式  | 介绍 |
@@ -188,7 +189,7 @@ app.use(imgOrder(config));
 
 /* 
 1.定制图片:
- when get localhost:3100/customizeImg/zz.png?imageView/0/h/500
+ localhost:3100/customizeImg/zz.png?imageView/0/h/500
  and so on...
 2. 不同格式输出
  localhost:3100/customizeImg/zz.png?/format/jpg
