@@ -84,6 +84,7 @@ var customizeImg = function(options) {
 
 		var mode1 = function(w, h) {
 			//等比缩放, 不裁剪
+			//no cropping
 			gm(imagePath).size(function(err, size) {
 				var originW = size.width;
 				var originH = size.height;
@@ -127,6 +128,7 @@ var customizeImg = function(options) {
 
 		var mode2 = function(w, h) {
 			//等比缩放, 裁剪
+			//cropping
 			gm(imagePath).size(function(err, size){
 				var originW = size.width;
 				var originH = size.height;
