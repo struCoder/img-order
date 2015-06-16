@@ -3,21 +3,20 @@ var fs = require('fs');
 var url = require('url');
 var gm = require('gm');
 
-/**
-	* dest: absolute path to images folder
-	* url: get customize image for example: customize-img
-				 and the result is domain.com/customizeImg/image.jpg?imageView/1/w/200/h/200
-	*	legalImg: jpg,jpeg,png,gif
-	* tempImgDir: orderTemp
-	* maxAge: 31536000  
-
-*/
+/*
+ * dest: absolute path to images folder
+ * url: get customize image for example: customize-img
+        and the result is domain.com/customizeImg/image.jpg?imageView/1/w/200/h/200
+ * legalImg: jpg,jpeg,png,gif
+ * tempImgDir: orderTemp
+ * maxAge: 31536000
+ */
 
 var customizeImg = function(options) {
 	var cache = {};
 	var IMAGE_TYPES = 'jpg,jpeg,png,gif,bmp';
 	var mode, arg;
-	var defaultMaxAge = 60 * 60 * 24 * 30 * 6;// half an year
+	var defaultMaxAge = 60 * 60 * 24 * 30 * 6;// half a year
 	var legalMode = [0, 1, 2, 3, 4, 5];
 	return function(req, res, next) {
 		var parsePath = url.parse(req.url, true);
@@ -85,6 +84,7 @@ var customizeImg = function(options) {
 
 		var mode1 = function(w, h) {
 			//等比缩放, 不裁剪
+			//no cropping
 			gm(imagePath).size(function(err, size) {
 				var originW = size.width;
 				var originH = size.height;
@@ -128,6 +128,7 @@ var customizeImg = function(options) {
 
 		var mode2 = function(w, h) {
 			//等比缩放, 裁剪
+			//cropping
 			gm(imagePath).size(function(err, size){
 				var originW = size.width;
 				var originH = size.height;
@@ -246,7 +247,7 @@ var customizeImg = function(options) {
 							.stream(function(err, stdout) {
 								pipeStream(stdout);
 							});
-				}				
+				}
 			});
 		}
 
@@ -335,7 +336,7 @@ var customizeImg = function(options) {
 					w = parseInt(argsArr[indexOfW + 1], 10);
 					h = parseInt(argsArr[indexOfH + 1], 10);
 					if (isNaN(w) || isNaN(h)) {
-						return endReq('illegal args', 1);		
+						return endReq('illegal args', 1);
 					}
 			} else {
 				return endReq('illegal mode', 1);
