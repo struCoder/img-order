@@ -16,7 +16,7 @@ var customizeImg = function(options) {
 	var cache = {};
 	var IMAGE_TYPES = 'jpg,jpeg,png,gif,bmp';
 	var mode, arg;
-	var defaultMaxAge = 60 * 60 * 24 * 30 * 6;// half an year
+	var defaultMaxAge = 60 * 60 * 24 * 30 * 6;// half a year
 	var legalMode = [0, 1, 2, 3, 4, 5];
 	return function(req, res, next) {
 		var parsePath = url.parse(req.url, true);
@@ -245,7 +245,7 @@ var customizeImg = function(options) {
 							.stream(function(err, stdout) {
 								pipeStream(stdout);
 							});
-				}				
+				}
 			});
 		}
 
