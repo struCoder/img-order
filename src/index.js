@@ -3,15 +3,14 @@ var fs = require('fs');
 var url = require('url');
 var gm = require('gm');
 
-/**
-	* dest: absolute path to images folder
-	* url: get customize image for example: customize-img
-				 and the result is domain.com/customizeImg/image.jpg?imageView/1/w/200/h/200
-	*	legalImg: jpg,jpeg,png,gif
-	* tempImgDir: orderTemp
-	* maxAge: 31536000  
-
-*/
+/*
+ * dest: absolute path to images folder
+ * url: get customize image for example: customize-img
+        and the result is domain.com/customizeImg/image.jpg?imageView/1/w/200/h/200
+ * legalImg: jpg,jpeg,png,gif
+ * tempImgDir: orderTemp
+ * maxAge: 31536000
+ */
 
 var customizeImg = function(options) {
 	var cache = {};
