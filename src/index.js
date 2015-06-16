@@ -334,7 +334,7 @@ var customizeImg = function(options) {
 					w = parseInt(argsArr[indexOfW + 1], 10);
 					h = parseInt(argsArr[indexOfH + 1], 10);
 					if (isNaN(w) || isNaN(h)) {
-						return endReq('illegal args', 1);		
+						return endReq('illegal args', 1);
 					}
 			} else {
 				return endReq('illegal mode', 1);
