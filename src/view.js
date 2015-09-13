@@ -1,6 +1,8 @@
-module.exports = function(argsArr) {
-  var argsArrLen = argsArr.length;
-  var mode1 = function(w, h) {
+var gm = require('gm');
+var tools = require('./lib');
+
+module.exports = function(argsArr, imagePath, res, mime, cache, cacheImagePath) {
+  function mode1(w, h) {
     //等比缩放, 不裁剪
     gm(imagePath).size(function(err, size) {
       var originW = size.width;
@@ -10,53 +12,53 @@ module.exports = function(argsArr) {
           if (w / h > originW / originH) {
             w = (originW * h / originH).toFixed(1);
             this.resize(w, h)
-                .stream(function(err, stdout) {
-                  pipeStream(stdout);
-                });
+              .stream(function(err, stdout) {
+                tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+              });
           } else {
             h = (w * originH / originW).toFixed(1);
             this.resize(w, h)
-                .stream(function(err, stdout) {
-                  pipeStream(stdout);
-                });
+              .stream(function(err, stdout) {
+                tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+              });
           }
         } else {
           this.stream(function(err, stdout) {
-                pipeStream(stdout);
-              });
+            tools.pipeStream(stdout, res, mime);
+          });
         }
       } else if (w || h) {
         var temp = w || h;
         if (temp > originW || temp > originH) {
           return this.stream(function(err, stdout) {
-            pipeStream(stdout);
+            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
           });
         }
 
         h = h || (temp * originH / originW).toFixed(1);
         w = w || (originW * temp / originH).toFixed(1);
         this.resize(w, h)
-            .stream(function(err, stdout) {
-              pipeStream(stdout);
-            });
+          .stream(function(err, stdout) {
+            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+          });
       }
     });
   }
 
-  var mode2 = function(w, h) {
+  function mode2(w, h) {
     //等比缩放, 裁剪
-    gm(imagePath).size(function(err, size){
+    gm(imagePath).size(function(err, size) {
       var originW = size.width;
       var originH = size.height;
       if (w && h) {
         if (w > originW && h > originH) {
           this.stream(function(err, stdout) {
-            pipeStream(stdout);
+            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
           });
         } else {
           if (w <= originW && h >= originH) {
             h = originH
-          } else if (w > originW && h < originH){
+          } else if (w > originW && h < originH) {
             w = originW
           }
           // this.out('-thumbnail', w + "x" + h + "^")
@@ -64,34 +66,34 @@ module.exports = function(argsArr) {
             .gravity("Center")
             .extent(w, h)
             .stream(function(err, stdout) {
-              pipeStream(stdout);
+              tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
             });
         }
       } else {
         var temp = w || h;
-        this.resize(temp, temp,"^")
-            .gravity("Center")
-            .extent(temp, temp)
-            .stream(function (err, stdout) {
-              pipeStream(stdout)
-            });
+        this.resize(temp, temp, "^")
+          .gravity("Center")
+          .extent(temp, temp)
+          .stream(function(err, stdout) {
+            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+          });
       }
     });
   }
 
-  var mode3 = function(w, h) {
+  function mode3(w, h) {
     mode1(w, h);
   }
 
-  var mode4 = function(w, h) {
+  function mode4(w, h) {
     gm(imagePath).size(function(err, size) {
       var originW = size.width;
       var originH = size.height;
       if (w && h) {
         if (w > originW && h > originH) {
           this.stream(function(err, stdout) {
-              pipeStream(stdout);
-            });
+            tools.pipeStream(stdout, res, mime);
+          });
         } else {
           if (w / h > originW / originH) {
             h = (w * originH / originW).toFixed(1);
@@ -99,16 +101,16 @@ module.exports = function(argsArr) {
             w = (h * originW / originH).toFixed(1);
           }
           this.resize(w, h)
-              .stream(function(err, stdout) {
-                pipeStream(stdout);
-              });
+            .stream(function(err, stdout) {
+              tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+            });
         }
       } else {
         var temp = w || h;
         if (temp > originW || temp > originH) {
           return this.stream(function(err, stdout) {
-              pipeStream(stdout);
-            });
+            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+          });
         }
         //  1 means w === h
         if (1 > originW / originH) {
@@ -118,14 +120,14 @@ module.exports = function(argsArr) {
         }
 
         this.resize(w, h)
-            .stream(function(err, stdout) {
-              pipeStream(stdout);
-            });
+          .stream(function(err, stdout) {
+            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+          });
       }
     });
   }
 
-  var mode5 = function(w, h) {
+  function mode5(w, h) {
     gm(imagePath).size(function(err, size) {
       var longEdje, shortEdje;
       if (size.width > size.height) {
@@ -139,18 +141,18 @@ module.exports = function(argsArr) {
         if (w / h > longEdje / shortEdje) {
           h = (w * shortEdje / longEdje).toFixed(1);
         } else {
-          w  = (longEdje * h / shortEdje).toFixed(1);
+          w = (longEdje * h / shortEdje).toFixed(1);
         }
         this.resize(w, h)
-            .stream(function(err, stdout) {
-              pipeStream(stdout);
-            });
+          .stream(function(err, stdout) {
+            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+          });
       } else {
         var temp = w || h;
         if (temp > longEdje) {
           return this.stream(function(err, stdout) {
-              pipeStream(stdout);
-            });
+            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+          });
         }
         //  1 means w === h
         if (1 > longEdje / shortEdje) {
@@ -160,14 +162,14 @@ module.exports = function(argsArr) {
         }
 
         this.resize(w, h)
-            .stream(function(err, stdout) {
-              pipeStream(stdout);
-            });
+          .stream(function(err, stdout) {
+            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+          });
       }
     });
   }
 
-  var mode6 = function(w, h) {
+  function mode6(w, h) {
     gm(imagePath).size(function(err, size) {
       var longEdje, shortEdje;
       if (size.width > size.height) {
@@ -180,58 +182,60 @@ module.exports = function(argsArr) {
       if (w && h) {
         if (w > longEdje && h > shortEdje) {
           this.resize(w, h)
-              .stream(function(err, stdout) {
-                pipeStream(stdout);
-              });
+            .stream(function(err, stdout) {
+              tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+            });
         } else {
           this.resize(w, h, "^")
-              .gravity('Center')
-              .extent(w, h)
-              .stream(function(err, stdout) {
-                pipeStream(stdout);
-              });
+            .gravity('Center')
+            .extent(w, h)
+            .stream(function(err, stdout) {
+              tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+            });
         }
       } else {
         var temp = w || h;
         if (temp > longEdje) {
           return this.stream(function(err, stdout) {
-              pipeStream(stdout);
-            });
+            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+          });
         }
         this.resize(temp, temp, "^")
-            .gravity('Center')
-            .extent(temp,temp)
-            .stream(function(err, stdout) {
-              pipeStream(stdout);
-            });
+          .gravity('Center')
+          .extent(temp, temp)
+          .stream(function(err, stdout) {
+            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+          });
       }
     });
   }
   var indexOfW = argsArr.indexOf('w');
   var indexOfH = argsArr.indexOf('h');
+  var argsArrLen = argsArr.length;
+  var mode = parseInt(argsArr[0], 10);
   var w, h;
   if (argsArrLen === 3) {
     if (indexOfW !== -1) {
       w = parseInt(argsArr[indexOfW + 1], 10);
       h = null;
       if (isNaN(w)) {
-        return endReq('illegal arg w', 1);
+        return tools.endReq({msg: 'illegal arg w', code: 1}, res);
       }
     } else {
       h = parseInt(argsArr[indexOfH + 1], 10);
       if (isNaN(h)) {
-        return endReq('illegal arg h', 1);
+        return tools.endReq({msg: 'illegal arg h', code: 1}, res);
       }
       w = null;
     }
   } else if (argsArrLen === 5) {
-      w = parseInt(argsArr[indexOfW + 1], 10);
-      h = parseInt(argsArr[indexOfH + 1], 10);
-      if (isNaN(w) || isNaN(h)) {
-        return endReq('illegal args', 1);
-      }
+    w = parseInt(argsArr[indexOfW + 1], 10);
+    h = parseInt(argsArr[indexOfH + 1], 10);
+    if (isNaN(w) || isNaN(h)) {
+      return tools.endReq({msg: 'illegal args', code: 1}, res);
+    }
   } else {
-    return endReq('illegal mode', 1);
+    return tools.endReq({msg: 'illegal mode', code: 1}, res);
   }
 
   switch (mode) {
@@ -254,6 +258,6 @@ module.exports = function(argsArr) {
       mode6(w, h);
       break;
     default:
-      endReq('end', 9);
+      tools.endReq({msg: 'end', code: 9}, res);
   }
 }
