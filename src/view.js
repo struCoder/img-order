@@ -1,7 +1,7 @@
 var gm = require('gm');
 var tools = require('./lib');
 
-module.exports = function(argsArr, imagePath, res, mime, cache, cacheImagePath) {
+module.exports = function(argsArr, imagePath, res, mime, cache) {
   function mode1(w, h) {
     //等比缩放, 不裁剪
     gm(imagePath).size(function(err, size) {
@@ -13,13 +13,13 @@ module.exports = function(argsArr, imagePath, res, mime, cache, cacheImagePath) 
             w = (originW * h / originH).toFixed(1);
             this.resize(w, h)
               .stream(function(err, stdout) {
-                tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+                tools.pipeStream(stdout, res, mime, cache);
               });
           } else {
             h = (w * originH / originW).toFixed(1);
             this.resize(w, h)
               .stream(function(err, stdout) {
-                tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+                tools.pipeStream(stdout, res, mime, cache);
               });
           }
         } else {
@@ -31,7 +31,7 @@ module.exports = function(argsArr, imagePath, res, mime, cache, cacheImagePath) 
         var temp = w || h;
         if (temp > originW || temp > originH) {
           return this.stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+            tools.pipeStream(stdout, res, mime, cache);
           });
         }
 
@@ -39,7 +39,7 @@ module.exports = function(argsArr, imagePath, res, mime, cache, cacheImagePath) 
         w = w || (originW * temp / originH).toFixed(1);
         this.resize(w, h)
           .stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+            tools.pipeStream(stdout, res, mime, cache);
           });
       }
     });
@@ -53,7 +53,7 @@ module.exports = function(argsArr, imagePath, res, mime, cache, cacheImagePath) 
       if (w && h) {
         if (w > originW && h > originH) {
           this.stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+            tools.pipeStream(stdout, res, mime, cache);
           });
         } else {
           if (w <= originW && h >= originH) {
@@ -66,7 +66,7 @@ module.exports = function(argsArr, imagePath, res, mime, cache, cacheImagePath) 
             .gravity("Center")
             .extent(w, h)
             .stream(function(err, stdout) {
-              tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+              tools.pipeStream(stdout, res, mime, cache);
             });
         }
       } else {
@@ -75,7 +75,7 @@ module.exports = function(argsArr, imagePath, res, mime, cache, cacheImagePath) 
           .gravity("Center")
           .extent(temp, temp)
           .stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+            tools.pipeStream(stdout, res, mime, cache);
           });
       }
     });
@@ -102,14 +102,14 @@ module.exports = function(argsArr, imagePath, res, mime, cache, cacheImagePath) 
           }
           this.resize(w, h)
             .stream(function(err, stdout) {
-              tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+              tools.pipeStream(stdout, res, mime, cache);
             });
         }
       } else {
         var temp = w || h;
         if (temp > originW || temp > originH) {
           return this.stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+            tools.pipeStream(stdout, res, mime, cache);
           });
         }
         //  1 means w === h
@@ -121,7 +121,7 @@ module.exports = function(argsArr, imagePath, res, mime, cache, cacheImagePath) 
 
         this.resize(w, h)
           .stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+            tools.pipeStream(stdout, res, mime, cache);
           });
       }
     });
@@ -145,13 +145,13 @@ module.exports = function(argsArr, imagePath, res, mime, cache, cacheImagePath) 
         }
         this.resize(w, h)
           .stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+            tools.pipeStream(stdout, res, mime, cache);
           });
       } else {
         var temp = w || h;
         if (temp > longEdje) {
           return this.stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+            tools.pipeStream(stdout, res, mime, cache);
           });
         }
         //  1 means w === h
@@ -163,7 +163,7 @@ module.exports = function(argsArr, imagePath, res, mime, cache, cacheImagePath) 
 
         this.resize(w, h)
           .stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+            tools.pipeStream(stdout, res, mime, cache);
           });
       }
     });
@@ -183,28 +183,28 @@ module.exports = function(argsArr, imagePath, res, mime, cache, cacheImagePath) 
         if (w > longEdje && h > shortEdje) {
           this.resize(w, h)
             .stream(function(err, stdout) {
-              tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+              tools.pipeStream(stdout, res, mime, cache);
             });
         } else {
           this.resize(w, h, "^")
             .gravity('Center')
             .extent(w, h)
             .stream(function(err, stdout) {
-              tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+              tools.pipeStream(stdout, res, mime, cache);
             });
         }
       } else {
         var temp = w || h;
         if (temp > longEdje) {
           return this.stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+            tools.pipeStream(stdout, res, mime, cache);
           });
         }
         this.resize(temp, temp, "^")
           .gravity('Center')
           .extent(temp, temp)
           .stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache, cacheImagePath);
+            tools.pipeStream(stdout, res, mime, cache);
           });
       }
     });
