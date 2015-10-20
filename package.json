@@ -1,6 +1,6 @@
 {
   "name": "img-order",
-  "version": "0.6.10",
+  "version": "0.7.0",
   "description": "Customize image to your needs",
   "main": "index.js",
   "scripts": {

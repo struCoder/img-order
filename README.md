@@ -32,6 +32,11 @@ npm install img-order
 
 Change log
 ------------
+### 2015-10-20
+- fix image interlace bug
+- Add image roate
+- Add image crop
+
 ### 2015-10-19
 Advanced image processing
 Include
@@ -93,6 +98,8 @@ Interface specification
         /blur/<radius>x<sigma>
         /format/<Format>
         /quality/<v>
+        /crop/<width>x<height>-<x>a<y>
+        /rotate/<deg>
 
 
 | mode  | Introduction |
@@ -102,7 +109,8 @@ Interface specification
 | /blur  | Gauss fuzzy parameters, <radius> is the fuzzy radius, the range is 1-50. <sigma> is the standard deviation of normal distribution, and must be greater than 0. When the image format is GIF, the parameter is not supported.  |
 | /quality/`v`  | Picture quality, the range is 1-100. Default 85  |
 | /format/`format`  | The output of the new format  |
-
+| /crop/`width`x`height`-`x`a`y` | cut image to you need, width is cut width, height is cut height, x and y is origin image coordinate |
+| /rotate/`deg` | rotate image |
 
 
 example
@@ -124,7 +132,7 @@ app.use(imgOrder(config));
  and so on...
 
 // advance use
-2. format
+2. advance use
  localhost:3100/customizeImg/zz.jpg?imagemogr/format/png
  localhost:3100/customizeImg/zz.jpg?imagemogr/blur/3x9
  localhost:3100/customizeImg/zz.jpg?imagemogr/quality/50
@@ -243,7 +251,8 @@ app.use(imgOrder(config));
         /blur/<radius>x<sigma>
         /format/<Format>
         /quality/<v>
-
+        /crop/<width>x<height>-<x>a<y>
+        /rotate/<deg>
 
 | mode  | Introduction |
 | ------------- | ------------- |
@@ -252,7 +261,7 @@ app.use(imgOrder(config));
 | /blur  | 高斯模糊参数，<radius>是模糊半径，取值范围为1-50。<sigma>是正态分布的标准差，必须大于0。图片格式为gif时，不支持该参数。  |
 | /quality/`v`  | 图片质量，取值范围为1-100。默认85  |
 | /format/`format`  | 图片格式化输出  |
-
+| /crop/`width`x`height`-`x`a`y` | 裁减你需要的图片, width, height为裁剪后的图片宽度和高度, x,y 为原始图片的裁剪坐标 |
 
 
 
@@ -277,7 +286,7 @@ app.use(imgOrder(config));
  and so on...
 
 //高级使用
-2. 不同格式输出
+2. 高级使用
  localhost:3100/customizeImg/zz.png?/format/jpg
  localhost:3100/customizeImg/zz.jpg?imagemogr/format/png
  localhost:3100/customizeImg/zz.jpg?imagemogr/blur/3x9
@@ -291,8 +300,8 @@ app.use(imgOrder(config));
 - [x]  图片的缩略
 - [x]  图片裁剪
 - [x]  不同格式图片输出
-- [ ]  旋转图片
-- [ ]  图片的渐进显示
+- [x]  旋转图片
+- [x]  图片的渐进显示
 - [ ]  水印
 - [ ]  EXIF(EXchangeable Image File Format)
 
