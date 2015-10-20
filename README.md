@@ -147,8 +147,8 @@ Todo
 - [x]  thumbnail image
 - [x]  image cut
 - [x]  format image
-- [ ]  rotate image
-- [ ]  progressive display
+- [x]  rotate image
+- [x]  progressive display
 - [ ]  watermark
 - [ ]  EXIF(EXchangeable Image File Format)
 
