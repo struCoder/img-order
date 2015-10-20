@@ -112,7 +112,7 @@ Interface specification
 | /format/`format`  | The output of the new format  |
 | /crop/`width`x`height`-`x`a`y` | cut image to you need, width is cut width, height is cut height, x and y is origin image coordinate |
 | /rotate/`deg` | rotate image |
-| /interlace/`num` | num => 0|1|2|3 means None|Line|Plane|Partition |
+| /interlace/`num` | num: 0 or 1 or 2 or 3 means None or Line or Plane or Partition |
 
 example
 ---------
