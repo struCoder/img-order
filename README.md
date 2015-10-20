@@ -100,6 +100,7 @@ Interface specification
         /quality/<v>
         /crop/<width>x<height>-<x>a<y>
         /rotate/<deg>
+        /interlace/<num>
 
 
 | mode  | Introduction |
@@ -111,7 +112,7 @@ Interface specification
 | /format/`format`  | The output of the new format  |
 | /crop/`width`x`height`-`x`a`y` | cut image to you need, width is cut width, height is cut height, x and y is origin image coordinate |
 | /rotate/`deg` | rotate image |
-
+| /interlace/`num` | num => 0|1|2|3 means None|Line|Plane|Partition |
 
 example
 ---------
@@ -260,6 +261,7 @@ app.use(imgOrder(config));
         /quality/<v>
         /crop/<width>x<height>-<x>a<y>
         /rotate/<deg>
+        /interlace/<num>
 
 | mode  | Introduction |
 | ------------- | ------------- |
@@ -269,7 +271,7 @@ app.use(imgOrder(config));
 | /quality/`v`  | 图片质量，取值范围为1-100。默认85  |
 | /format/`format`  | 图片格式化输出  |
 | /crop/`width`x`height`-`x`a`y` | 裁减你需要的图片, width, height为裁剪后的图片宽度和高度, x,y 为原始图片的裁剪坐标 |
-
+| /interlace/`num` | num的取值范围为[0,3], 意思分别为不渐进, 线性渐进, 单位面渐进, 分裂渐进 |
 
 
 示例
