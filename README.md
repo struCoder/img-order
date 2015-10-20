@@ -147,8 +147,8 @@ Todo
 - [x]  thumbnail image
 - [x]  image cut
 - [x]  format image
-- [ ]  rotate image
-- [ ]  progressive display
+- [x]  rotate image
+- [x]  progressive display
 - [ ]  watermark
 - [ ]  EXIF(EXchangeable Image File Format)
 
@@ -191,6 +191,13 @@ npm install img-order
 
 修改纪录
 ------------
+
+
+### 2015-10-20
+-  修复图片渐进显示的bug
+-  添加图片旋转
+-  添加图片的指定位置裁剪
+
 ### 2015-10-19
 图片高级处理
 包括
