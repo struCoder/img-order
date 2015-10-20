@@ -38,9 +38,9 @@ module.exports = function(argsArr, imagePath, res, mime, cache) {
       tools.pipeStream(stdout, res, mime, cache);
     });
   }
-
+  //None|Line|Plane|Partition
   function interlace(type) {
-    var _temp = '01';
+    var _temp = '0123';
     if (_temp.indexOf(type) === -1) {
       tools.endReq({
         msg: 'wrong args'
@@ -48,7 +48,14 @@ module.exports = function(argsArr, imagePath, res, mime, cache) {
       return;
     }
     type = parseInt(type, 10);
-    type = type || 'None';
+    type = type;
+    var map = {
+      0: 'None',
+      1: 'Line',
+      2: 'Plane',
+      3: 'Partition'
+    }
+    type = map[type] || 'None';
     gm(imagePath).interlace(type).stream(function(err, stdout) {
       tools.pipeStream(stdout, res, mime, cache);
     });
@@ -81,6 +88,45 @@ module.exports = function(argsArr, imagePath, res, mime, cache) {
     })
   }
 
+  function rotate(deg) {
+    deg = deg || 0;
+    if (isNaN(deg)) {
+      tools.endReq({msg: 'invalid type'}, res);
+      return;
+    }
+    gm(imagePath).rotate('white', deg).stream(function(err, stdout) {
+      tools.pipeStream(stdout, res, mime, cache);
+    })
+  }
+
+  function crop(arg) {
+    //200x200-10a10
+    var _tempArr = arg.split('-');
+    var _xy = _tempArr[0].split('x');
+    var _wh = _tempArr[1].split('a');
+    var x = parseInt(_xy[0], 10);
+    var y = parseInt(_xy[1], 10);
+    var w = parseInt(_wh[0], 10);
+    var h = parseInt(_wh[1], 10);
+    if(isNaN(x) || isNaN(y) || isNaN(w) || isNaN(h)) {
+      tools.endReq({msg: 'invalid type'}, res);
+      return;
+    }
+    gm(imagePath).size(function(err, size) {
+      var originW = size.width;
+      var originH = size.height;
+      if (x > originW || y > originH) {
+        this.stream(function(err, stdout) {
+          tools.pipeStream(stdout, res, mime, cache)
+        })
+      } else {
+        this.crop(x, y, w, h).stream(function(err, stdout) {
+          tools.pipeStream(stdout, res, mime, cache);
+        });
+      }
+    });
+  }
+
 
   switch (argsArr[0]) {
     case 'format':
@@ -99,6 +145,12 @@ module.exports = function(argsArr, imagePath, res, mime, cache) {
       break;
     case 'autoorient':
       autoOrient();
+      break;
+    case 'rotate':
+      rotate(argsArr[1]);
+      break;
+    case 'crop':
+      crop(argsArr[1]);
       break;
     default:
       tools.endReq({msg: 'illegal interface', code: 9}, res);
