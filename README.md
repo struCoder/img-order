@@ -174,18 +174,23 @@ mogr.format('absolute/path/to/you/image', 'png', function(err, stream) {
 __Basic Use Api__
 
 // see Interface specification mode0
+
 view.mode1('absulote imagePath', width, height, callback)
 
 // see Interface specification mode1
+
 view.mode2('absulote imagePath',width, height, callback);
 
 // see Interface specification mode2
+
 view.mode3('absulote imagePath', width, height, callback);
 
 // see Interface specification mode3
+
 view.mode4('absulote imagePath', widht, height, callback);
 
 // see Interface specification mode4
+
 view.mode5('absulote imagePath', widht, height, callback);
 
 // see Interface specification mode5
