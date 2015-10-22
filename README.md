@@ -32,14 +32,19 @@ npm install img-order
 
 Change log
 ------------
+
+### 2015-10-22
+-  Export API for Developer to processed image(see example)
+
 ### 2015-10-20
-- fix image interlace bug
+- Fix image interlace bug
 - Add image roate
 - Add image crop
 
 ### 2015-10-19
 Advanced image processing
 Include
+
 -  According to the original EXIF information automatic rotation
 -  Removal of meta information in the image.
 -  Gauss fuzzy parameter
@@ -76,7 +81,6 @@ Interface specification
     imageView /<mode>
         /w/<Width>
         /h/<Height>
-        /format/<Format>
 
 
 | mode  | Introduction |
@@ -116,8 +120,12 @@ Interface specification
 
 example
 ---------
+
+###use as nodejs middleware
+
 ```javascript
 ...
+
 var imgOrder = require('img-order');
 var config = {
   dest: 'C:/Users/david/Pictures/lovewallpaper/',
@@ -141,6 +149,72 @@ app.use(imgOrder(config));
 */
 ...
 ```
+
+### use processed image api
+```javascript
+var imgOrder = require('img-order');
+var view = imgOrder.view;
+var mogr = imgOrder.mogr;
+var fs = require('fs');
+
+view.mode1('absolute/path/to/you/image', 200, null, function(err, stream) {
+  var write = fs.createWriteStream('test.jpg');
+  stream.pipe(write)    //or stream.pipe(res).  ups to your need
+});
+
+mogr.format('absolute/path/to/you/image', 'png', function(err, stream) {
+  var write = fs.createWriteStream('test.jpg');
+  stream.pipe(write)    //or stream.pipe(res).  ups to your need
+});
+
+//And so on...
+```
+
+### API LIST
+__Basic Use Api__
+
+// see Interface specification mode0
+view.mode1('absulote imagePath', width, height, callback)
+
+// see Interface specification mode1
+view.mode2('absulote imagePath',width, height, callback);
+
+// see Interface specification mode2
+view.mode3('absulote imagePath', width, height, callback);
+
+// see Interface specification mode3
+view.mode4('absulote imagePath', widht, height, callback);
+
+// see Interface specification mode4
+view.mode5('absulote imagePath', widht, height, callback);
+
+// see Interface specification mode5
+view.mode6('absulote imagePath', widht, height, callback);
+
+callback:
+>  function(err, stream) {}
+
+
+__Advance Use Api__
+mogr.format('absulote imagePath', formatType(string), callback);
+
+mogr.rotate('absulote imagePath', deg(int | string), callback);
+
+mogr.crop('absulote imagePath', width, height, x, y, callback);
+
+mogr.quality('absulote imagePath', v(int), callback);
+
+mogr.interlace('absulote imagePath', ('Node | Line | Plane | Partition'), callback);
+
+mogr.strip('absulote imagePath', callback);
+
+mogr.blur('absulote imagePath', callback);
+
+mogr.autoOrient('absulote imagePath', callback);
+
+
+callback:
+>  function(err, stream) {}
 
 
 Todo
@@ -192,7 +266,8 @@ npm install img-order
 
 修改纪录
 ------------
-
+### 2015-10-22
+-  为开发者提供接口
 
 ### 2015-10-20
 -  修复图片渐进显示的bug
@@ -200,8 +275,10 @@ npm install img-order
 -  添加图片的指定位置裁剪
 
 ### 2015-10-19
+
 图片高级处理
 包括
+
 -  根据原图EXIF信息自动旋正
 -  去除图片中的元信息。
 -  高斯模糊参数，<radius>是模糊半径，取值范围为1-50。<sigma>是正态分布的标准差，必须大于0。图片格式为gif时，不支持该参数。
@@ -215,7 +292,9 @@ Basic image processing
 
 如何使用 ?
 ----------
-If you use `experss` or `koa` you just do this
+
+###  作为Nodejs中间件
+如果你使用`express`或者`koa`
 ```javascript
 var app = require('express'); // or app = ('koa')
 var imgOrder = require('img-order');
@@ -228,7 +307,43 @@ var config = {
     maxAge: 2592000                             // 可选 cache-control
 }
 app.use(imgOrder(config));
+
+// 基本使用
+1.定制图片:
+ localhost:3100/customizeImg/zz.png?imageView/0/h/500
+ and so on...
+
+//高级使用
+2. 高级使用
+ localhost:3100/customizeImg/zz.png?/format/jpg
+ localhost:3100/customizeImg/zz.jpg?imagemogr/format/png
+ localhost:3100/customizeImg/zz.jpg?imagemogr/blur/3x9
+ localhost:3100/customizeImg/zz.jpg?imagemogr/quality/50
+ ad so on...
 ```
+
+
+
+###  使用开发接口
+```javascript
+var imgOrder = require('img-order');
+var view = imgOrder.view;
+var mogr = imgOrder.mogr;
+var fs = require('fs');
+
+view.mode1('absolute/path/to/you/image', 200, null, function(err, stream) {
+  var write = fs.createWriteStream('test.jpg');
+  stream.pipe(write)    //or stream.pipe(res).  ups to your need
+});
+
+mogr.format('absolute/path/to/you/image', 'png', function(err, stream) {
+  var write = fs.createWriteStream('test.jpg');
+  stream.pipe(write)    //or stream.pipe(res).  ups to your need
+});
+
+//And so on...
+```
+
 
 接口规范
 -----------------------
@@ -247,7 +362,6 @@ app.use(imgOrder(config));
 | /3/w/`Width`/h/`Height`  | 限定缩略图的宽最少为`Width`，高最少为`Height`，进行等比缩放，不裁剪。如果只指定`w` 参数或只指定`h`. 参数，代表长宽限定为同样的值  |
 | /4/w/`LongEdge`/h/`ShortEdge`  | 限定缩略图的长边最少为`LongEdge`，短边最少为`ShortEdge`，进行等比缩放，不裁剪。如果只指定`w` 参数或只指定 `h` 参数，表示长边短边限定为同样的值  |
 | /5/w/`LongEdge`/h/`ShortEdge`  | 限定缩略图的长边最少为`LongEdge`，短边最少为`ShortEdge`，进行等比缩放，居中裁剪。如果只指定`w` 参数或只指定`h`. 参数，表示长边短边限定为同样的值  |
-
 
 
 
@@ -274,35 +388,53 @@ app.use(imgOrder(config));
 | /interlace/`num` | num的取值范围为[0,3], 意思分别为不渐进, 线性渐进, 单位面渐进, 分裂渐进 |
 
 
-示例
----------
-```javascript
-...
-var imgOrder = require('img-order');
-var config = {
-  dest: 'C:/Users/david/Pictures/lovewallpaper/',
-  url: 'customizeImg',
-  tempImgDir: 'C:/Users/david/Pictures/temp'
-}
-app.use(imgOrder(config));
-...
-
-/*
-
-// 基本使用
-1.定制图片:
- localhost:3100/customizeImg/zz.png?imageView/0/h/500
- and so on...
-
-//高级使用
-2. 高级使用
- localhost:3100/customizeImg/zz.png?/format/jpg
- localhost:3100/customizeImg/zz.jpg?imagemogr/format/png
- localhost:3100/customizeImg/zz.jpg?imagemogr/blur/3x9
- localhost:3100/customizeImg/zz.jpg?imagemogr/quality/50
- ad so on...
-*/
 ```
+### API LIST
+__基础图片处理接口__
+
+// 见接口规范中的 mode0
+view.mode1('absulote imagePath', width, height, callback)
+
+// 见接口规范中的 mode1
+view.mode2('absulote imagePath',width, height, callback);
+
+// 见接口规范中的 mode2
+view.mode3('absulote imagePath', width, height, callback);
+
+// 见接口规范中的 mode3
+view.mode4('absulote imagePath', widht, height, callback);
+
+// 见接口规范中的 mode4
+view.mode5('absulote imagePath', widht, height, callback);
+
+// 见接口规范中的 mode5
+view.mode6('absulote imagePath', widht, height, callback);
+
+callback:
+>  function(err, stream) {}
+
+
+__高级图片处理接口__
+mogr.format('absulote imagePath', formatType(string), callback);
+
+mogr.rotate('absulote imagePath', deg(int | string), callback);
+
+mogr.crop('absulote imagePath', width, height, x, y, callback);
+
+mogr.quality('absulote imagePath', v(int), callback);
+
+mogr.interlace('absulote imagePath', ('Node | Line | Plane | Partition'), callback);
+
+mogr.strip('absulote imagePath', callback);
+
+mogr.blur('absulote imagePath', callback);
+
+mogr.autoOrient('absulote imagePath', callback);
+
+
+callback:
+>  function(err, stream) {}
+
 
 需要完成的任务
 -------

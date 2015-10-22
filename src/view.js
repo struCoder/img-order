@@ -1,84 +1,225 @@
 var gm = require('gm');
 var tools = require('./lib');
 
-module.exports = function(argsArr, imagePath, res, mime, cache) {
-  function mode1(w, h) {
-    //等比缩放, 不裁剪
-    gm(imagePath).size(function(err, size) {
-      var originW = size.width;
-      var originH = size.height;
-      if (w && h) {
-        if (w < originW || h < originH) {
-          if (w / h > originW / originH) {
-            w = (originW * h / originH).toFixed(1);
-            this.resize(w, h)
-              .stream(function(err, stdout) {
-                tools.pipeStream(stdout, res, mime, cache);
-              });
-          } else {
-            h = (w * originH / originW).toFixed(1);
-            this.resize(w, h)
-              .stream(function(err, stdout) {
-                tools.pipeStream(stdout, res, mime, cache);
-              });
-          }
-        } else {
-          this.stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime);
-          });
-        }
-      } else if (w || h) {
-        var temp = w || h;
-        if (temp > originW || temp > originH) {
-          return this.stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache);
-          });
-        }
+var imageView = module.exports = _imageView;
 
-        h = h || (temp * originH / originW).toFixed(1);
-        w = w || (originW * temp / originH).toFixed(1);
-        this.resize(w, h)
+imageView.mode1 = function(imagePath, w, h, cb) {
+  //等比缩放, 不裁剪
+  gm(imagePath).size(function(err, size) {
+    var originW = size.width;
+    var originH = size.height;
+    if (w && h) {
+      if (w < originW || h < originH) {
+        if (w / h > originW / originH) {
+          w = (originW * h / originH).toFixed(1);
+          this.resize(w, h)
+            .stream(function(err, stdout) {
+              cb(err, stdout);
+            });
+        } else {
+          h = (w * originH / originW).toFixed(1);
+          this.resize(w, h)
+            .stream(function(err, stdout) {
+              cb(err, stdout);
+            });
+        }
+      } else {
+        this.stream(function(err, stdout) {
+          cb(err, stdout);
+        });
+      }
+    } else if (w || h) {
+      var temp = w || h;
+      if (temp > originW || temp > originH) {
+        return this.stream(function(err, stdout) {
+          cb(err, stdout);
+        });
+      }
+
+      h = h || (temp * originH / originW).toFixed(1);
+      w = w || (originW * temp / originH).toFixed(1);
+      this.resize(w, h)
+        .stream(function(err, stdout) {
+          cb(err, stdout);
+        });
+    }
+  });
+}
+
+imageView.mode2 = function(imagePath, w, h, cb) {
+   //等比缩放, 裁剪
+  gm(imagePath).size(function(err, size) {
+    var originW = size.width;
+    var originH = size.height;
+    if (w && h) {
+      if (w > originW && h > originH) {
+        this.stream(function(err, stdout) {
+          cb(err, stdout);
+        });
+      } else {
+        if (w <= originW && h >= originH) {
+          h = originH
+        } else if (w > originW && h < originH) {
+          w = originW
+        }
+        // this.out('-thumbnail', w + "x" + h + "^")
+        this.resize(w, h, "^")
+          .gravity("Center")
+          .extent(w, h)
           .stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache);
+            cb(err, stdout);
           });
       }
+    } else {
+      var temp = w || h;
+      this.resize(temp, temp, "^")
+        .gravity("Center")
+        .extent(temp, temp)
+        .stream(function(err, stdout) {
+          cb(err, stdout);
+        });
+    }
+  });
+}
+
+imageView.mode4 = function(imagePath, w, h, cb) {
+  gm(imagePath).size(function(err, size) {
+    var originW = size.width;
+    var originH = size.height;
+    if (w && h) {
+      if (w > originW && h > originH) {
+        this.stream(function(err, stdout) {
+          cb(err, stdout);
+        });
+      } else {
+        if (w / h > originW / originH) {
+          h = (w * originH / originW).toFixed(1);
+        } else {
+          w = (h * originW / originH).toFixed(1);
+        }
+        this.resize(w, h)
+          .stream(function(err, stdout) {
+            cb(err, stdout);
+          });
+      }
+    } else {
+      var temp = w || h;
+      if (temp > originW || temp > originH) {
+        this.stream(function(err, stdout) {
+          cb(err, stdout);
+        });
+        return;
+      }
+      //  1 means w === h
+      if (1 > originW / originH) {
+        h = (temp * originH / originW).toFixed(1);
+      } else {
+        w = (temp * originW / originH).toFixed(1);
+      }
+
+      this.resize(w, h)
+        .stream(function(err, stdout) {
+          cb(err, stdout);
+        });
+    }
+  });
+}
+
+imageView.mode5 = function(imagePath, w, h, cb) {
+  gm(imagePath).size(function(err, size) {
+    var longEdje, shortEdje;
+    if (size.width > size.height) {
+      longEdje = size.width;
+      shortEdje = size.height;
+    } else {
+      shortEdje = size.width;
+      longEdje = size.height;
+    }
+    if (w && h) {
+      if (w / h > longEdje / shortEdje) {
+        h = (w * shortEdje / longEdje).toFixed(1);
+      } else {
+        w = (longEdje * h / shortEdje).toFixed(1);
+      }
+      this.resize(w, h)
+        .stream(function(err, stdout) {
+          cb(err, stdout);
+        });
+    } else {
+      var temp = w || h;
+      if (temp > longEdje) {
+        return this.stream(function(err, stdout) {
+          cb(err, stdout);
+        });
+      }
+      //  1 means w === h
+      if (1 > longEdje / shortEdje) {
+        h = (temp * shortEdje / longEdje).toFixed(1);
+      } else {
+        w = (temp * longEdje / shortEdje).toFixed(1);
+      }
+
+      this.resize(w, h)
+        .stream(function(err, stdout) {
+          cb(err, stdout);
+        });
+    }
+  });
+}
+
+imageView.mode6 = function(imagePath, w, h, cb) {
+  gm(imagePath).size(function(err, size) {
+    var longEdje, shortEdje;
+    if (size.width > size.height) {
+      longEdje = size.width;
+      shortEdje = size.height;
+    } else {
+      shortEdje = size.width;
+      longEdje = size.height;
+    }
+    if (w && h) {
+      if (w > longEdje && h > shortEdje) {
+        this.resize(w, h)
+          .stream(function(err, stdout) {
+            cb(err, stdout);
+          });
+      } else {
+        this.resize(w, h, "^")
+          .gravity('Center')
+          .extent(w, h)
+          .stream(function(err, stdout) {
+            cb(err, stdout);
+          });
+      }
+    } else {
+      var temp = w || h;
+      if (temp > longEdje) {
+        this.stream(function(err, stdout) {
+          cb(err, stdout);
+        });
+        return;
+      }
+      this.resize(temp, temp, "^")
+        .gravity('Center')
+        .extent(temp, temp)
+        .stream(function(err, stdout) {
+          cb(err, stdout);
+        });
+    }
+  });
+}
+function _imageView(argsArr, imagePath, res, mime, cache) {
+  function mode1(w, h) {
+    //等比缩放, 不裁剪
+    imageView.mode1(imagePath, w, h, function(err, buf) {
+      tools.pipeStream(buf, res, mime, cache);
     });
   }
 
   function mode2(w, h) {
-    //等比缩放, 裁剪
-    gm(imagePath).size(function(err, size) {
-      var originW = size.width;
-      var originH = size.height;
-      if (w && h) {
-        if (w > originW && h > originH) {
-          this.stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache);
-          });
-        } else {
-          if (w <= originW && h >= originH) {
-            h = originH
-          } else if (w > originW && h < originH) {
-            w = originW
-          }
-          // this.out('-thumbnail', w + "x" + h + "^")
-          this.resize(w, h, "^")
-            .gravity("Center")
-            .extent(w, h)
-            .stream(function(err, stdout) {
-              tools.pipeStream(stdout, res, mime, cache);
-            });
-        }
-      } else {
-        var temp = w || h;
-        this.resize(temp, temp, "^")
-          .gravity("Center")
-          .extent(temp, temp)
-          .stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache);
-          });
-      }
-    });
+    imageView.mode2(imagePath, w, h, function(err, buf) {
+      tools.pipeStream(buf, res, mime, cache);
+    })
   }
 
   function mode3(w, h) {
@@ -86,127 +227,20 @@ module.exports = function(argsArr, imagePath, res, mime, cache) {
   }
 
   function mode4(w, h) {
-    gm(imagePath).size(function(err, size) {
-      var originW = size.width;
-      var originH = size.height;
-      if (w && h) {
-        if (w > originW && h > originH) {
-          this.stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime);
-          });
-        } else {
-          if (w / h > originW / originH) {
-            h = (w * originH / originW).toFixed(1);
-          } else {
-            w = (h * originW / originH).toFixed(1);
-          }
-          this.resize(w, h)
-            .stream(function(err, stdout) {
-              tools.pipeStream(stdout, res, mime, cache);
-            });
-        }
-      } else {
-        var temp = w || h;
-        if (temp > originW || temp > originH) {
-          return this.stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache);
-          });
-        }
-        //  1 means w === h
-        if (1 > originW / originH) {
-          h = (temp * originH / originW).toFixed(1);
-        } else {
-          w = (temp * originW / originH).toFixed(1);
-        }
-
-        this.resize(w, h)
-          .stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache);
-          });
-      }
+    imageView.mode4(imagePath, w, h, function(err, buf) {
+      tools.pipeStream(buf, res, mime, cache);
     });
   }
 
   function mode5(w, h) {
-    gm(imagePath).size(function(err, size) {
-      var longEdje, shortEdje;
-      if (size.width > size.height) {
-        longEdje = size.width;
-        shortEdje = size.height;
-      } else {
-        shortEdje = size.width;
-        longEdje = size.height;
-      }
-      if (w && h) {
-        if (w / h > longEdje / shortEdje) {
-          h = (w * shortEdje / longEdje).toFixed(1);
-        } else {
-          w = (longEdje * h / shortEdje).toFixed(1);
-        }
-        this.resize(w, h)
-          .stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache);
-          });
-      } else {
-        var temp = w || h;
-        if (temp > longEdje) {
-          return this.stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache);
-          });
-        }
-        //  1 means w === h
-        if (1 > longEdje / shortEdje) {
-          h = (temp * shortEdje / longEdje).toFixed(1);
-        } else {
-          w = (temp * longEdje / shortEdje).toFixed(1);
-        }
-
-        this.resize(w, h)
-          .stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache);
-          });
-      }
+    imageView.mode5(imagePath, w, h, function(err, buf) {
+      tools.pipeStream(buf, res, mime, cache);
     });
   }
 
   function mode6(w, h) {
-    gm(imagePath).size(function(err, size) {
-      var longEdje, shortEdje;
-      if (size.width > size.height) {
-        longEdje = size.width;
-        shortEdje = size.height;
-      } else {
-        shortEdje = size.width;
-        longEdje = size.height;
-      }
-      if (w && h) {
-        if (w > longEdje && h > shortEdje) {
-          this.resize(w, h)
-            .stream(function(err, stdout) {
-              tools.pipeStream(stdout, res, mime, cache);
-            });
-        } else {
-          this.resize(w, h, "^")
-            .gravity('Center')
-            .extent(w, h)
-            .stream(function(err, stdout) {
-              tools.pipeStream(stdout, res, mime, cache);
-            });
-        }
-      } else {
-        var temp = w || h;
-        if (temp > longEdje) {
-          return this.stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache);
-          });
-        }
-        this.resize(temp, temp, "^")
-          .gravity('Center')
-          .extent(temp, temp)
-          .stream(function(err, stdout) {
-            tools.pipeStream(stdout, res, mime, cache);
-          });
-      }
+    imageView.mode6(imagePath, w, h, function(err, buf) {
+      tools.pipeStream(buf, res, mime, cache);
     });
   }
   var indexOfW = argsArr.indexOf('w');

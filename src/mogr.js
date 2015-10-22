@@ -1,12 +1,75 @@
 var gm = require('gm');
 var tools = require('./lib');
 
-module.exports = function(argsArr, imagePath, res, mime, cache) {
+
+var mogr = module.exports = _mogr;
+
+mogr.autoOrient = function (imagePath, cb) {
+  gm(imagePath).autoOrient().stream(function(err, stdout) {
+    cb(err, stdout);
+  });
+}
+
+
+mogr.blur = function(imagePath, radius, sigma, cb) {
+  gm(imagePath).blur(radius, sigma).stream(function(err, stdout) {
+      cb(err, stdout);
+  });
+}
+
+mogr.strip = function(imagePath, cb) {
+  gm(imagePath).strip().stream(function(err, stdout) {
+    cb(err, stdout);
+  });
+}
+
+
+mogr.interlace = function(imagePath, type, cb) {
+  gm(imagePath).interlace(type).stream(function(err, stdout) {
+    cb(err, stdout);
+  });
+}
+
+
+mogr.quality = function(imagePath, v, cb) {
+  gm(imagePath).quality(v).stream(function(err, stdout) {
+    cb(err, stdout);
+  });
+}
+
+mogr.format = function(imagePath, type, cb) {
+  gm(imagePath).stream(type, function(err, stdout) {
+    cb(err, stdout);
+  });
+}
+
+mogr.rotate = function(imagePath, deg, cb) {
+  gm(imagePath).rotate('white', deg).stream(function(err, stdout) {
+    cb(err, stdout);
+  });
+}
+
+mogr.crop = function(imagePath, w, h, x, y, cb) {
+  gm(imagePath).size(function(err, size) {
+    var originW = size.width;
+    var originH = size.height;
+    if (x > originW || y > originH) {
+      this.stream(function(err, stdout) {
+        cb(err, stdout);
+      })
+    } else {
+      this.crop(x, y, w, h).stream(function(err, stdout) {
+        cb(err, stdout);
+      });
+    }
+  });
+}
+function _mogr(argsArr, imagePath, res, mime, cache) {
 
   function autoOrient() {
-    gm(imagePath).autoOrient().stream(function(err, stdout) {
-      tools.pipeStream(stdout, res, mime, cache);
-    });
+    mogr.autoOrient(imagePath, function(err, buf) {
+      tools.pipeStream(buf, res, mime, cache);
+    })
   }
 
   function blur(argStr) {
@@ -26,16 +89,14 @@ module.exports = function(argsArr, imagePath, res, mime, cache) {
       }, res);
     }
     sigma = sigma || 1;
-    gm(imagePath)
-      .blur(radius, sigma)
-      .stream(function(err, stdout) {
-        tools.pipeStream(stdout, res, mime, cache);
-      });
+    mogr.blur(imagePath, radius, sigma, function(err, buf) {
+      tools.pipeStream(buf, res, mime, cache);
+    });
   }
 
   function strip() {
-    gm(imagePath).strip().stream(function(err, stdout) {
-      tools.pipeStream(stdout, res, mime, cache);
+    mogr.strip(imagePath, function(err, buf) {
+      tools.pipeStream(buf, res, mime, cache);
     });
   }
   //None|Line|Plane|Partition
@@ -56,8 +117,8 @@ module.exports = function(argsArr, imagePath, res, mime, cache) {
       3: 'Partition'
     }
     type = map[type] || 'None';
-    gm(imagePath).interlace(type).stream(function(err, stdout) {
-      tools.pipeStream(stdout, res, mime, cache);
+    mogr.interlace(imagePath, type, function(err, buf) {
+      tools.pipeStream(buf, res, mime, cache);
     });
   }
 
@@ -71,8 +132,8 @@ module.exports = function(argsArr, imagePath, res, mime, cache) {
       }, res);
       return;
     }
-    gm(imagePath).quality(v).stream(function(err, stdout) {
-      tools.pipeStream(stdout, res, mime, cache);
+    mogr.quality(imagePath, v, function(err, buf) {
+      tools.pipeStream(buf, res, mime, cache);
     });
   }
 
@@ -81,11 +142,12 @@ module.exports = function(argsArr, imagePath, res, mime, cache) {
       tools.endReq({
         msg: 'invalid type, support: ' + cache.imageType
       }, res);
-      return;
+    } else {
+      mogr.format(imagePath, type, function(err, buf) {
+        tools.pipeStream(buf, res, mime, cache);
+      });
     }
-    gm(imagePath).stream(type, function(err, stdout) {
-      tools.pipeStream(stdout, res, type, cache);
-    })
+
   }
 
   function rotate(deg) {
@@ -94,9 +156,9 @@ module.exports = function(argsArr, imagePath, res, mime, cache) {
       tools.endReq({msg: 'invalid type'}, res);
       return;
     }
-    gm(imagePath).rotate('white', deg).stream(function(err, stdout) {
-      tools.pipeStream(stdout, res, mime, cache);
-    })
+    mogr.rotate(imagePath, deg, function(err, buf) {
+      tools.pipeStream(buf, res, mime, cache);
+    });
   }
 
   function crop(arg) {
@@ -112,18 +174,8 @@ module.exports = function(argsArr, imagePath, res, mime, cache) {
       tools.endReq({msg: 'invalid type'}, res);
       return;
     }
-    gm(imagePath).size(function(err, size) {
-      var originW = size.width;
-      var originH = size.height;
-      if (x > originW || y > originH) {
-        this.stream(function(err, stdout) {
-          tools.pipeStream(stdout, res, mime, cache)
-        })
-      } else {
-        this.crop(x, y, w, h).stream(function(err, stdout) {
-          tools.pipeStream(stdout, res, mime, cache);
-        });
-      }
+    mogr.crop(imagePath, w, h, x, y, function(err, buf) {
+      tools.pipeStream(buf, res, mime, cache);
     });
   }
 
