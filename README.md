@@ -405,9 +405,11 @@ view.mode3('absulote imagePath', width, height, callback);
 view.mode4('absulote imagePath', widht, height, callback);
 
 // 见接口规范中的 mode4
+
 view.mode5('absulote imagePath', widht, height, callback);
 
 // 见接口规范中的 mode5
+
 view.mode6('absulote imagePath', widht, height, callback);
 
 callback:
