@@ -1,8 +1,9 @@
-var gm = require('gm');
-var tools = require('./lib');
+'use strict';
 
+const gm = require('gm');
+const tools = require('./lib');
 
-var mogr = module.exports = _mogr;
+let mogr = module.exports = _mogr;
 
 mogr.autoOrient = function (imagePath, cb) {
   gm(imagePath).autoOrient().stream(function(err, stdout) {
@@ -51,8 +52,8 @@ mogr.rotate = function(imagePath, deg, cb) {
 
 mogr.crop = function(imagePath, w, h, x, y, cb) {
   gm(imagePath).size(function(err, size) {
-    var originW = size.width;
-    var originH = size.height;
+    const originW = size.width;
+    const originH = size.height;
     if (x > originW || y > originH) {
       this.stream(function(err, stdout) {
         cb(err, stdout);
@@ -65,7 +66,6 @@ mogr.crop = function(imagePath, w, h, x, y, cb) {
   });
 }
 function _mogr(argsArr, imagePath, res, mime, cache) {
-
   function autoOrient() {
     mogr.autoOrient(imagePath, function(err, buf) {
       tools.pipeStream(buf, res, mime, cache);
@@ -73,20 +73,14 @@ function _mogr(argsArr, imagePath, res, mime, cache) {
   }
 
   function blur(argStr) {
-    var _args = argStr.split('x');
+    const _args = argStr.split('x');
     if (_args.length !== 2) {
-      tools.endReq({
-        msg: 'args wrong'
-      }, res);
-      return
+      return tools.endReq(res, 'args wrong');
     }
-    var radius = _args[0];
-    var sigma = _args[1];
+    let radius = _args[0];
+    let sigma = _args[1];
     if (radius < 1 || radius > 50) {
-      return tools.endReq({
-        msg: 'radius should between 1 and 50',
-        code: 1
-      }, res);
+      return tools.endReq(res, 'radius should between 1 and 50');
     }
     sigma = sigma || 1;
     mogr.blur(imagePath, radius, sigma, function(err, buf) {
@@ -101,16 +95,13 @@ function _mogr(argsArr, imagePath, res, mime, cache) {
   }
   //None|Line|Plane|Partition
   function interlace(type) {
-    var _temp = '0123';
-    if (_temp.indexOf(type) === -1) {
-      tools.endReq({
-        msg: 'wrong args'
-      }, res);
-      return;
+    const tmp = '0123';
+    if (tmp.indexOf(type) === -1) {
+      return tools.endReq(res, 'wrong args');
     }
     type = parseInt(type, 10);
     type = type;
-    var map = {
+    const map = {
       0: 'None',
       1: 'Line',
       2: 'Plane',
@@ -126,11 +117,7 @@ function _mogr(argsArr, imagePath, res, mime, cache) {
     v = parseInt(v, 10);
     v = v || 85;
     if (v < 1 || v > 100) {
-      tools.endReq({
-        msg: 'the value should between 1 and 100',
-        code: 1
-      }, res);
-      return;
+      return tools.endReq(res, 'the value should between 1 and 100');
     }
     mogr.quality(imagePath, v, function(err, buf) {
       tools.pipeStream(buf, res, mime, cache);
@@ -139,9 +126,7 @@ function _mogr(argsArr, imagePath, res, mime, cache) {
 
   function format(type) {
     if (cache.imageType.indexOf(type) === -1) {
-      tools.endReq({
-        msg: 'invalid type, support: ' + cache.imageType
-      }, res);
+      tools.endReq(res, `invalid type, support:${cache.imageType}`);
     } else {
       mogr.format(imagePath, type, function(err, buf) {
         tools.pipeStream(buf, res, mime, cache);
@@ -153,7 +138,7 @@ function _mogr(argsArr, imagePath, res, mime, cache) {
   function rotate(deg) {
     deg = deg || 0;
     if (isNaN(deg)) {
-      tools.endReq({msg: 'invalid type'}, res);
+      tools.endReq(res, 'invalid type');
       return;
     }
     mogr.rotate(imagePath, deg, function(err, buf) {
@@ -163,15 +148,15 @@ function _mogr(argsArr, imagePath, res, mime, cache) {
 
   function crop(arg) {
     //200x200-10a10
-    var _tempArr = arg.split('-');
-    var _xy = _tempArr[0].split('x');
-    var _wh = _tempArr[1].split('a');
-    var x = parseInt(_xy[0], 10);
-    var y = parseInt(_xy[1], 10);
-    var w = parseInt(_wh[0], 10);
-    var h = parseInt(_wh[1], 10);
+    const _tempArr = arg.split('-');
+    const _xy = _tempArr[0].split('x');
+    const _wh = _tempArr[1].split('a');
+    const x = parseInt(_xy[0], 10);
+    const y = parseInt(_xy[1], 10);
+    const w = parseInt(_wh[0], 10);
+    const h = parseInt(_wh[1], 10);
     if(isNaN(x) || isNaN(y) || isNaN(w) || isNaN(h)) {
-      tools.endReq({msg: 'invalid type'}, res);
+      tools.endReq(res, 'invalid type');
       return;
     }
     mogr.crop(imagePath, w, h, x, y, function(err, buf) {
@@ -205,7 +190,7 @@ function _mogr(argsArr, imagePath, res, mime, cache) {
       crop(argsArr[1]);
       break;
     default:
-      tools.endReq({msg: 'illegal interface', code: 9}, res);
+      tools.endReq(res, 'illegal interface');
       return;
   }
 }

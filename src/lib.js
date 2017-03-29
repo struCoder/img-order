@@ -1,22 +1,24 @@
-var fs = require('fs');
+'use strict';
 
-function endReq(data, res) {
-  var returnJson = {};
-  data.code = data.code || 0;
-  returnJson.code = data.code;
-  returnJson.msg = data.msg || "";
+const fs = require('fs');
+
+exports.endReq = function(res, msg) {
+  let resData = {
+    code: -1,
+    msg: msg
+  };
   res.statusCode = 400;
-  return res.end(JSON.stringify(returnJson));
+  return res.end(JSON.stringify(resData));
 }
 
-function setHeader(res, mime, cache, utcStr) {
+exports.setHeader = function(res, mime, cache, utcStr) {
   res.setHeader('Content-Type', 'image/' + mime);
   res.setHeader('Cache-Control', 'public, max-age=' + cache.maxAge);
   utcStr && res.setHeader('Last-Modified', utcStr);
 }
 
-function pipeStream(stream, res, mime, cache) {
-  setHeader(res, mime, cache);
+exports.pipeStream = function(stream, res, mime, cache) {
+  exports.setHeader(res, mime, cache);
   if (cache.tempImgDir && cache.cacheImagePath) {
     var imagePath = cache.cacheImagePath;
     imagePath = imagePath.substring(0, imagePath.lastIndexOf('.')) + '.' + mime;
@@ -25,7 +27,3 @@ function pipeStream(stream, res, mime, cache) {
   }
   stream.pipe(res);
 }
-
-exports.endReq = endReq;
-exports.setHeader = setHeader;
-exports.pipeStream = pipeStream;

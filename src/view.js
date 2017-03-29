@@ -1,7 +1,8 @@
-var gm = require('gm');
-var tools = require('./lib');
+'use strict';
+const gm = require('gm');
+const tools = require('./lib');
 
-var imageView = module.exports = _imageView;
+const imageView = module.exports = _imageView;
 
 imageView.mode1 = function(imagePath, w, h, cb) {
   //等比缩放, 不裁剪
@@ -243,22 +244,24 @@ function _imageView(argsArr, imagePath, res, mime, cache) {
       tools.pipeStream(buf, res, mime, cache);
     });
   }
-  var indexOfW = argsArr.indexOf('w');
-  var indexOfH = argsArr.indexOf('h');
-  var argsArrLen = argsArr.length;
-  var mode = parseInt(argsArr[0], 10);
-  var w, h;
+
+  const indexOfW = argsArr.indexOf('w');
+  const indexOfH = argsArr.indexOf('h');
+  const argsArrLen = argsArr.length;
+  const mode = parseInt(argsArr[0], 10);
+  
+  let w, h;
   if (argsArrLen === 3) {
     if (indexOfW !== -1) {
       w = parseInt(argsArr[indexOfW + 1], 10);
       h = null;
       if (isNaN(w)) {
-        return tools.endReq({msg: 'illegal arg w', code: 1}, res);
+        return tools.endReq(res, 'illegal arg w');
       }
     } else {
       h = parseInt(argsArr[indexOfH + 1], 10);
       if (isNaN(h)) {
-        return tools.endReq({msg: 'illegal arg h', code: 1}, res);
+        return tools.endReq(res, 'illegal arg h');
       }
       w = null;
     }
@@ -266,10 +269,10 @@ function _imageView(argsArr, imagePath, res, mime, cache) {
     w = parseInt(argsArr[indexOfW + 1], 10);
     h = parseInt(argsArr[indexOfH + 1], 10);
     if (isNaN(w) || isNaN(h)) {
-      return tools.endReq({msg: 'illegal args', code: 1}, res);
+      return tools.endReq(res, 'illegal args');
     }
   } else {
-    return tools.endReq({msg: 'illegal mode', code: 1}, res);
+    return tools.endReq(res, 'illegal mode');
   }
 
   switch (mode) {
@@ -292,6 +295,6 @@ function _imageView(argsArr, imagePath, res, mime, cache) {
       mode6(w, h);
       break;
     default:
-      tools.endReq({msg: 'end', code: 9}, res);
+      tools.endReq(res, 'end');
   }
 }
